@@ -1,5 +1,8 @@
-export const fetchModels = async (apiKey) => {
-    const response = await fetch("https://api.openai.com/v1/models", {
+import { defaultApiEndpoint } from './globals.js';
+
+export const fetchModels = async (apiKey, apiEndpoint = defaultApiEndpoint) => {
+    const baseUrl = apiEndpoint.replace(/\/+$/, '');
+    const response = await fetch(`${baseUrl}/v1/models`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -14,16 +17,17 @@ export const fetchModels = async (apiKey) => {
     return await response.json();
 };
 
-export const fetchResponse = async (apiKey, model, messages, maxTokens) => {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+export const fetchResponse = async (apiKey, model, messages, maxTokens, apiEndpoint = defaultApiEndpoint) => {
+    const baseUrl = apiEndpoint.replace(/\/+$/, '');
+    const response = await fetch(`${baseUrl}/v1/chat/completions`, {
         method: "POST",
-        headers: { 
-            "Content-Type": "application/json", 
-            Authorization: `Bearer ${apiKey}` 
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${apiKey}`
         },
-        body: JSON.stringify({ 
-            model, 
-            messages: messages, 
+        body: JSON.stringify({
+            model,
+            messages: messages,
             ...(maxTokens > 0 ? { 'max_tokens': parseInt(maxTokens) } : {})
         }),
     });
@@ -32,7 +36,7 @@ export const fetchResponse = async (apiKey, model, messages, maxTokens) => {
         const errorDetail = await response.text();
         throw new Error(`API request failed: ${response.status}, Detail: ${errorDetail}`);
     }
-    
+
 
     const responseData = await response.json();
     return responseData.choices[0].message.content;

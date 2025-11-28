@@ -10,3 +10,4 @@ export const defaultActions = [
 ];
 export const chatPrompt = "You are a helpful chatbot, answer any questions the user has";
 export const defaultModel = "gpt-3.5-turbo";
+export const defaultApiEndpoint = "https://api.openai.com";

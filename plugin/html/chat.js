@@ -31,9 +31,9 @@ document.addEventListener('DOMContentLoaded', async function () {
       messagesContainer.appendChild(loadingIcon);
       
       try {
-        const { apiKey, model, maxTokens } = await browser.storage.local.get(
-                                                    ["apiKey","model", "maxTokens"]);
-        const response = await fetchResponse(apiKey, model, messages, maxTokens);
+        const { apiKey, model, maxTokens, apiEndpoint } = await browser.storage.local.get(
+                                                    ["apiKey","model", "maxTokens", "apiEndpoint"]);
+        const response = await fetchResponse(apiKey, model, messages, maxTokens, apiEndpoint);
        // messagesContainer.innerText = response;
         // Remove loading icon and enable button when API call finishes
        loadingIcon.parentElement.removeChild(loadingIcon);

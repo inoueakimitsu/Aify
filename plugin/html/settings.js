@@ -1,5 +1,5 @@
 import { fetchModels } from './API.js';
-import { promptVersion, defaultActions, defaultModel } from './globals.js';
+import { promptVersion, defaultActions, defaultModel, defaultApiEndpoint } from './globals.js';
 
 const addAction = (name, prompt, actionsContainer) => {
     const actionDiv = document.createElement("div");
@@ -60,16 +60,17 @@ const handleWarning = (promptUpdated, notesContainer) => {
     }
 };
 
-const saveSettings = (actionsContainer, modelSelect, apiKeyInput, maxTokensInput, maxSizeInput) => {
+const saveSettings = (actionsContainer, modelSelect, apiKeyInput, apiEndpointInput, maxTokensInput, maxSizeInput) => {
     const actions = Array.from(actionsContainer.children).map(actionDiv => {
         const nameInput = actionDiv.querySelector(".action-name");
         const promptInput = actionDiv.querySelector(".action-prompt");
         return { name: nameInput.value, prompt: promptInput.value };
     });
-    
+
     browser.storage.local.set({
         model: modelSelect.value,
         apiKey: apiKeyInput.value,
+        apiEndpoint: apiEndpointInput.value || defaultApiEndpoint,
         actions: actions,
         maxTokens: maxTokensInput.value,
         maxSize: maxSizeInput.value,
@@ -77,12 +78,13 @@ const saveSettings = (actionsContainer, modelSelect, apiKeyInput, maxTokensInput
     });
 };
 
-const setDefaultSettings = (actionsContainer, modelSelect, apiKeyInput, maxTokensInput, maxSizeInput) => {
+const setDefaultSettings = (actionsContainer, modelSelect, apiKeyInput, apiEndpointInput, maxTokensInput, maxSizeInput) => {
     while (actionsContainer.firstChild) {
         actionsContainer.firstChild.remove();
     }
     modelSelect.value = defaultModel;
     apiKeyInput.value = "";
+    apiEndpointInput.value = defaultApiEndpoint;
     maxTokensInput.value = 0;
     maxSizeInput.value = 0;
     defaultActions.forEach(({ name, prompt }) => {
@@ -90,15 +92,16 @@ const setDefaultSettings = (actionsContainer, modelSelect, apiKeyInput, maxToken
     });
     browser.storage.local.set({
         model: defaultModel,
-        apiKey: "", 
+        apiKey: "",
+        apiEndpoint: defaultApiEndpoint,
         actions: defaultActions,
         promptUpdated: promptVersion
     });
 };
 
-const getModels = async (apiKey) => {
-    const responseData = await fetchModels(apiKey);
-    
+const getModels = async (apiKey, apiEndpoint) => {
+    const responseData = await fetchModels(apiKey, apiEndpoint);
+
     var selectElement = document.getElementById("model");
     selectElement.remove(0);
     responseData.data.map(model => {
@@ -122,6 +125,7 @@ const addModelToSelect = (model, modelSelect) => {
 document.addEventListener("DOMContentLoaded", () => {
     const modelSelect = document.getElementById("model");
     const apiKeyInput = document.getElementById("api-key");
+    const apiEndpointInput = document.getElementById("api-endpoint");
     const actionsContainer = document.getElementById("actions-container");
     const addActionButton = document.getElementById("add-action");
     const saveButton = document.getElementById("save-settings");
@@ -131,10 +135,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const defaultButton = document.getElementById("default-settings");
     const notesContainer = document.getElementById("notes-container");
 
-    browser.storage.local.get(["model", "apiKey", "actions", "maxTokens", "promptUpdated", "maxSize"], (data) => {
-        const { model = defaultModel, apiKey = '', maxTokens = 0, promptUpdated = 0, maxSize = 0, actions = defaultActions } = data;
+    browser.storage.local.get(["model", "apiKey", "apiEndpoint", "actions", "maxTokens", "promptUpdated", "maxSize"], (data) => {
+        const { model = defaultModel, apiKey = '', apiEndpoint = defaultApiEndpoint, maxTokens = 0, promptUpdated = 0, maxSize = 0, actions = defaultActions } = data;
 
         apiKeyInput.value = apiKey;
+        apiEndpointInput.value = apiEndpoint;
         addModelToSelect(model, modelSelect);
         maxTokensInput.value = maxTokens;
         maxSizeInput.value = maxSize;
@@ -143,8 +148,8 @@ document.addEventListener("DOMContentLoaded", () => {
         actions.forEach(({ name, prompt }) => addAction(name, prompt, actionsContainer));
 
         addActionButton.addEventListener("click", () => addAction("", "", actionsContainer));
-        saveButton.addEventListener("click", () => saveSettings(actionsContainer, modelSelect, apiKeyInput, maxTokensInput, maxSizeInput));
-        defaultButton.addEventListener("click", () => setDefaultSettings(actionsContainer, modelSelect, apiKeyInput, maxTokensInput, maxSizeInput));
-        getModelsButton.addEventListener("click", () => getModels(apiKeyInput.value));
+        saveButton.addEventListener("click", () => saveSettings(actionsContainer, modelSelect, apiKeyInput, apiEndpointInput, maxTokensInput, maxSizeInput));
+        defaultButton.addEventListener("click", () => setDefaultSettings(actionsContainer, modelSelect, apiKeyInput, apiEndpointInput, maxTokensInput, maxSizeInput));
+        getModelsButton.addEventListener("click", () => getModels(apiKeyInput.value, apiEndpointInput.value || defaultApiEndpoint));
     });
 });

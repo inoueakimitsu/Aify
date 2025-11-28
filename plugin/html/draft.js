@@ -9,9 +9,9 @@ async function generate(draftContainer, messages, draftTitle) {
     draftContainer.appendChild(loadingIcon);
 
     try {
-        const { apiKey, model, maxTokens } = await browser.storage.local.get(
-                                                ["apiKey","model", "maxTokens"]);
-        const response = await fetchResponse(apiKey, model, messages, maxTokens);
+        const { apiKey, model, maxTokens, apiEndpoint } = await browser.storage.local.get(
+                                                ["apiKey","model", "maxTokens", "apiEndpoint"]);
+        const response = await fetchResponse(apiKey, model, messages, maxTokens, apiEndpoint);
         draftContainer.innerText = response;
         messages.push({role: "assistant", content: response});
         document.title = draftTitle;
