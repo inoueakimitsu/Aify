@@ -1,4 +1,4 @@
-import { promptVersion } from './globals.js';
+import { promptVersion, defaultActions } from './globals.js';
 
 const truncate = async (text) => {
     const { maxSize } = await browser.storage.local.get(
@@ -47,7 +47,7 @@ const addAction = (name, prompt, actionsContainer) => {
 document.addEventListener("DOMContentLoaded", () => {
     const actionsContainer = document.getElementById("actions-container");
     browser.storage.local.get(["actions", "promptUpdated"], (data) => {
-        const { actions, promptUpdated = 0 } = data;
+        const { actions = defaultActions, promptUpdated = 0 } = data;
         if (promptVersion > promptUpdated) {
             const warningIcon = document.createElement('img');
             warningIcon.src = "/images/warning.png";

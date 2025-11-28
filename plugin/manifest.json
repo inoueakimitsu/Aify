@@ -15,7 +15,7 @@
     "32": "/images/icon-32px.png",
     "16": "/images/icon-16px.png"
   },
-  "permissions": ["menus", "storage", "compose"],
+  "permissions": ["menus", "storage", "compose", "<all_urls>"],
   "options_ui": {
     "page": "/html/settings.html",
     "open_in_tab": true
