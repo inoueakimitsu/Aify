@@ -1,7 +1,7 @@
 import { defaultApiEndpoint } from './globals.js';
 
 export const fetchModels = async (apiKey, apiEndpoint = defaultApiEndpoint) => {
-    const baseUrl = apiEndpoint.replace(/\/+$/, '');
+    const baseUrl = (apiEndpoint || defaultApiEndpoint).replace(/\/+$/, '');
     const response = await fetch(`${baseUrl}/v1/models`, {
         method: "GET",
         headers: {
@@ -18,7 +18,7 @@ export const fetchModels = async (apiKey, apiEndpoint = defaultApiEndpoint) => {
 };
 
 export const fetchResponse = async (apiKey, model, messages, maxTokens, apiEndpoint = defaultApiEndpoint) => {
-    const baseUrl = apiEndpoint.replace(/\/+$/, '');
+    const baseUrl = (apiEndpoint || defaultApiEndpoint).replace(/\/+$/, '');
     const response = await fetch(`${baseUrl}/v1/chat/completions`, {
         method: "POST",
         headers: {
